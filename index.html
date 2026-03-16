@@ -1,0 +1,53 @@
+<!DOCTYPE html>
+<html lang="pt-br">
+
+<head>
+
+<meta charset="UTF-8">
+
+<title>Felipe Borges</title>
+
+<link rel="stylesheet" href="style.css">
+
+<link href="https://fonts.googleapis.com/css2?family=Poppins&display=swap" rel="stylesheet">
+
+</head>
+
+<body>
+
+<div class="container">
+
+<h1>Felipe Borges</h1>
+
+<img id="foto" src="photo.jpeg" alt="Minha foto">
+
+<p>
+Olá! Meu nome é Felipe Borges e sou estudante de Engenharia da Computação no CEFET-MG.
+</p>
+
+<button onclick="botaoMisterioso()">Clique aqui</button>
+
+</div>
+
+<script>
+let escuro = true;
+
+function botaoMisterioso(){
+
+    if(escuro){
+        document.body.style.backgroundColor = "#39007f";
+        escuro = false;
+    }else{
+        document.body.style.backgroundColor = "#1f1f1f";
+        escuro = true;
+    }
+
+    new Audio("https://www.soundjay.com/buttons/sounds/button-3.mp3").play();
+
+}
+
+</script>
+
+</body>
+
+</html>
