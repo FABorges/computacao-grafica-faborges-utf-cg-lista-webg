@@ -30,19 +30,10 @@ Olá! Meu nome é Felipe Borges e sou estudante de Engenharia da Computação no
 </div>
 
 <script>
-let escuro = true;
-
 function botaoMisterioso(){
 
-    if(escuro){
-        document.body.style.backgroundColor = "#39007f";
-        escuro = false;
-    }else{
-        document.body.style.backgroundColor = "#1f1f1f";
-        escuro = true;
-    }
-
-    new Audio("https://www.soundjay.com/buttons/sounds/button-3.mp3").play();
+    let cor = "#" + Math.floor(Math.random()*16777215).toString(16);
+    document.body.style.backgroundColor = cor;
 
 }
 
