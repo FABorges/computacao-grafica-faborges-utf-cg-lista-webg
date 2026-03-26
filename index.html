@@ -1,44 +1,86 @@
 <!DOCTYPE html>
-<html lang="pt-br">
+<html>
+<body style="margin:0; background:#111;">
 
-<head>
-
-<meta charset="UTF-8">
-
-<title>Felipe Borges</title>
-
-<link rel="stylesheet" href="style.css">
-
-<link href="https://fonts.googleapis.com/css2?family=Poppins&display=swap" rel="stylesheet">
-
-</head>
-
-<body>
-
-<div class="container">
-
-<h1>Felipe Borges</h1>
-
-<img id="foto" src="photo.jpeg" alt="Minha foto">
-
-<p>
-Olá! Meu nome é Felipe Borges e sou estudante de Engenharia da Computação no CEFET-MG.
-</p>
-
-<button onclick="botaoMisterioso()">Clique aqui</button>
-
-</div>
+<canvas id="c" width="600" height="600"></canvas>
 
 <script>
-function botaoMisterioso(){
+const gl = document.getElementById("c").getContext("webgl");
 
-    let cor = "#" + Math.floor(Math.random()*16777215).toString(16);
-    document.body.style.backgroundColor = cor;
 
+const vs = `
+attribute vec2 pos;
+uniform vec2 offset;
+void main(){
+    gl_Position = vec4(pos + offset, 0, 1);
+}`;
+
+const fs = `
+precision mediump float;
+uniform vec3 color;
+void main(){
+    gl_FragColor = vec4(color,1);
+}`;
+
+
+function shader(type, src){
+    let s = gl.createShader(type);
+    gl.shaderSource(s, src);
+    gl.compileShader(s);
+    return s;
 }
 
+let prog = gl.createProgram();
+gl.attachShader(prog, shader(gl.VERTEX_SHADER, vs));
+gl.attachShader(prog, shader(gl.FRAGMENT_SHADER, fs));
+gl.linkProgram(prog);
+gl.useProgram(prog);
+
+
+let verts = new Float32Array([
+    -0.2,-0.2,
+     0.2,-0.2,
+     0.2, 0.2,
+    -0.2, 0.2
+]);
+
+let idx = new Uint16Array([0,1,2, 0,2,3]);
+
+let vbo = gl.createBuffer();
+gl.bindBuffer(gl.ARRAY_BUFFER, vbo);
+gl.bufferData(gl.ARRAY_BUFFER, verts, gl.STATIC_DRAW);
+
+let ebo = gl.createBuffer();
+gl.bindBuffer(gl.ELEMENT_ARRAY_BUFFER, ebo);
+gl.bufferData(gl.ELEMENT_ARRAY_BUFFER, idx, gl.STATIC_DRAW);
+
+let pos = gl.getAttribLocation(prog, "pos");
+gl.vertexAttribPointer(pos, 2, gl.FLOAT, false, 0, 0);
+gl.enableVertexAttribArray(pos);
+
+
+let offset = gl.getUniformLocation(prog, "offset");
+let color = gl.getUniformLocation(prog, "color");
+
+
+let d = 0.5;
+
+let squares = [
+    [-d, d,[1,0,0]], [0,d,[0,1,0]], [d,d,[0,0,1]],
+    [-d,0,[1,1,0]], [0,0,[1,0,1]], [d,0,[0,1,1]],
+    [-d,-d,[1,0.5,0]], [0,-d,[0.5,0,1]], [d,-d,[1,1,1]]
+];
+
+
+gl.clearColor(0.1,0.1,0.1,1);
+gl.clear(gl.COLOR_BUFFER_BIT);
+
+for(let s of squares){
+    gl.uniform2f(offset, s[0], s[1]);
+    gl.uniform3fv(color, s[2]);
+    gl.drawElements(gl.TRIANGLES, 6, gl.UNSIGNED_SHORT, 0);
+}
 </script>
 
 </body>
-
 </html>
