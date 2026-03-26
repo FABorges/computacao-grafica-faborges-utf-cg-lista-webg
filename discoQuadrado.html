@@ -1,0 +1,108 @@
+<!DOCTYPE html>
+<html>
+<body style="margin:0; background:#111;">
+
+<canvas id="c" width="600" height="600"></canvas>
+
+<script>
+const gl = document.getElementById("c").getContext("webgl");
+
+
+const vs = `
+attribute vec2 pos;
+void main(){
+    gl_Position = vec4(pos, 0, 1);
+}`;
+
+const fs = `
+precision mediump float;
+uniform vec3 color;
+void main(){
+    gl_FragColor = vec4(color,1);
+}`;
+
+
+function shader(type, src){
+    let s = gl.createShader(type);
+    gl.shaderSource(s, src);
+    gl.compileShader(s);
+    return s;
+}
+
+let prog = gl.createProgram();
+gl.attachShader(prog, shader(gl.VERTEX_SHADER, vs));
+gl.attachShader(prog, shader(gl.FRAGMENT_SHADER, fs));
+gl.linkProgram(prog);
+gl.useProgram(prog);
+
+let o = 0.8; 
+let i = 0.3; 
+
+let verts = new Float32Array([
+    -o,-o,  o,-o,  o, o,  -o, o,  
+    -i,-i,  i,-i,  i, i,  -i, i    
+]);
+
+
+let idx = new Uint16Array([
+    0,1,4,  1,5,4,
+    1,2,5,  2,6,5,
+    2,3,6,  3,7,6,
+    3,0,7,  0,4,7
+]);
+
+
+let vbo = gl.createBuffer();
+gl.bindBuffer(gl.ARRAY_BUFFER, vbo);
+gl.bufferData(gl.ARRAY_BUFFER, verts, gl.STATIC_DRAW);
+
+let ebo = gl.createBuffer();
+gl.bindBuffer(gl.ELEMENT_ARRAY_BUFFER, ebo);
+gl.bufferData(gl.ELEMENT_ARRAY_BUFFER, idx, gl.STATIC_DRAW);
+
+let pos = gl.getAttribLocation(prog, "pos");
+gl.vertexAttribPointer(pos, 2, gl.FLOAT, false, 0, 0);
+gl.enableVertexAttribArray(pos);
+
+
+let color = gl.getUniformLocation(prog, "color");
+
+
+let mostrarLinhas = false;
+
+document.addEventListener("keydown", (e)=>{
+    if(e.key === "c"){
+        mostrarLinhas = !mostrarLinhas;
+        draw();
+    }
+});
+
+
+function draw(){
+    gl.clearColor(0.1,0.1,0.1,1);
+    gl.clear(gl.COLOR_BUFFER_BIT);
+
+    gl.uniform3f(color, 0, 0, 1);
+    gl.drawElements(gl.TRIANGLES, idx.length, gl.UNSIGNED_SHORT, 0);
+
+    if(mostrarLinhas){
+
+        gl.uniform3f(color, 0, 0, 0);
+
+        for(let i = 0; i < idx.length; i += 3){
+            gl.drawElements(
+                gl.LINE_LOOP,
+                3,
+                gl.UNSIGNED_SHORT,
+                i * 2
+            );
+        }
+    }
+}
+
+draw();
+
+</script>
+
+</body>
+</html>
